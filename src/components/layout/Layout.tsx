@@ -1,174 +1,134 @@
-import { useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { FileText, Users, Calendar, User, Home, Settings, LogOut, Droplets, BarChart3, Menu, X } from 'lucide-react'
+import {
+  Home, Users, Camera, FileText, BarChart3, Droplets,
+  Settings as SettingsIcon, QrCode, MapPin, ChevronRight
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useAuthStore, isAdmin } from '@/stores/authStore'
 
 export default function Layout() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
 
-  const navigation = [
+  // 拍照记录专用底部 Tab（借鉴巡查相机 + 今日水印相机）
+  const bottomTabs = [
     { name: '首页', href: '/', icon: Home },
-    { name: '工作台', href: '/dashboard', icon: Calendar },
-    { name: '患者管理', href: '/patients', icon: Users },
-    { name: '治疗记录', href: '/records', icon: FileText },
-    { name: '统计分析', href: '/statistics', icon: BarChart3 },
+    { name: '客户', href: '/patients', icon: Users },
+    {
+      name: '拍照记录',
+      href: '/records/new',
+      icon: Camera,
+      highlight: true,
+    },
+    { name: '记录', href: '/records', icon: FileText },
+    { name: '统计', href: '/statistics', icon: BarChart3 },
   ]
 
-  // 仅管理员可见的用户管理链接
-  if (isAdmin(user)) {
-    navigation.push({ name: '用户管理', href: '/users', icon: Settings })
-  }
-
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+  // 顶部快捷入口（工作台）
+  const quickActions = [
+    { name: '二维码签到', href: '/verify', icon: QrCode, tint: 'bg-blue-500' },
+    { name: '定位打卡', href: '/records/new', icon: MapPin, tint: 'bg-emerald-500' },
+    { name: '水印设置', href: '/watermark-settings', icon: Droplets, tint: 'bg-purple-500' },
+    { name: '偏好设置', href: '/profile', icon: SettingsIcon, tint: 'bg-amber-500' },
+  ]
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
-      {/* Header */}
-      <header className="border-b sticky top-0 bg-background z-40">
-        <div className="container mx-auto flex h-14 md:h-16 items-center justify-between px-4">
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <h1 className="text-base md:text-xl font-bold text-primary">治疗记录系统</h1>
-          </div>
-
-          {/* Desktop user menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-muted-foreground">
-                {user?.name || '用户'}
-              </span>
-              <Link
-                to="/watermark-settings"
-                className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors min-w-[44px] min-h-[44px]"
-                title="水印配置"
-              >
-                <Droplets className="h-5 w-5" />
-              </Link>
-              <Link
-                to="/profile"
-                className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors min-w-[44px] min-h-[44px]"
-                title="个人资料"
-              >
-                <User className="h-5 w-5" />
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors min-w-[44px] min-h-[44px]"
-                title="退出登录"
-              >
-                <LogOut className="h-5 w-5" />
-              </button>
+    <div className="min-h-screen bg-slate-50 pb-20 md:pb-0">
+      {/* 顶部固定条 */}
+      <header className="sticky top-0 z-40 bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-sm">
+        <div className="h-14 md:h-16 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur">
+              <Camera className="w-5 h-5" />
+            </div>
+            <div className="leading-tight">
+              <div className="text-[15px] font-semibold tracking-wide">治疗拍照记录</div>
+              <div className="text-[11px] opacity-80">一拍即一记录 · 实时水印存证</div>
             </div>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors min-w-[44px] min-h-[44px]"
-            aria-label="菜单"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="hidden md:flex items-center gap-2">
+            {quickActions.map((a) => (
+              <Link
+                key={a.name}
+                to={a.href}
+                className="flex items-center gap-2 px-3 h-9 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm"
+              >
+                <a.icon className="w-4 h-4" />
+                <span>{a.name}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </header>
 
-      {/* Mobile menu overlay */}
-      {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-14 bg-black/50 z-30" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute top-0 right-0 w-64 h-full bg-background border-l shadow-lg" onClick={e => e.stopPropagation()}>
-            <div className="p-4 space-y-2">
-              <div className="px-3 py-2 text-sm text-muted-foreground">
-                {user?.name || '用户'}
-              </div>
+      {/* 移动端：首页快捷行动栏（仅首页显示，参考巡检打卡 App） */}
+      {location.pathname === '/' && (
+        <section className="md:hidden bg-white border-b border-slate-200">
+          <div className="grid grid-cols-4 gap-1 p-3">
+            {quickActions.map((a) => (
               <Link
-                to="/watermark-settings"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors min-h-[44px]"
+                key={a.name}
+                to={a.href}
+                className="flex flex-col items-center gap-1 py-2 active:scale-95 transition-transform"
               >
-                <Droplets className="h-5 w-5" />
-                <span>水印配置</span>
+                <div className={cn(
+                  "w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm text-white",
+                  a.tint,
+                )}>
+                  <a.icon className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] text-slate-700">{a.name}</span>
               </Link>
-              <Link
-                to="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors min-h-[44px]"
-              >
-                <User className="h-5 w-5" />
-                <span>个人资料</span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-3 px-3 py-3 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors min-h-[44px] w-full"
-              >
-                <LogOut className="h-5 w-5" />
-                <span>退出登录</span>
-              </button>
-            </div>
+            ))}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Desktop Navigation */}
-      <nav className="hidden md:block border-b bg-muted/50">
-        <div className="container mx-auto px-4">
-          <ul className="flex space-x-1 overflow-x-auto">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href
-              return (
-                <li key={item.name}>
-                  <Link
-                    to={item.href}
-                    className={cn(
-                      "flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors min-h-[48px]",
-                      isActive
-                        ? "border-b-2 border-primary text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      </nav>
-
-      {/* Main content */}
-      <main className="container mx-auto px-4 py-4 md:py-6">
+      {/* 主内容区 */}
+      <main className="max-w-3xl mx-auto md:max-w-6xl md:px-4 py-4 md:py-6">
         <Outlet />
       </main>
 
-      {/* Footer - Desktop only */}
-      <footer className="hidden md:block border-t py-6 text-center text-sm text-muted-foreground">
-        <p>治疗师治疗记录系统 © 2024 - 专业、可靠的治疗记录管理平台</p>
+      {/* 桌面底栏 */}
+      <footer className="hidden md:block border-t py-5 text-center text-xs text-slate-400">
+        治疗师拍照记录系统 · 借鉴自：巡查相机(filecamera) / 今日水印相机 / 草料留痕相机 / 橙子巡检 / Immich
       </footer>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t z-40">
-        <div className="flex justify-around items-center h-16">
-          {navigation.slice(0, 5).map((item) => {
-            const isActive = location.pathname === item.href
+      {/* 移动端底部 Tab */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-40 safe-area-bottom">
+        <div className="flex items-end h-16">
+          {bottomTabs.map((item) => {
+            const active = item.href === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.href)
+            if (item.highlight) {
+              // 中间凸起大按钮（主流打卡 App 风格）
+              return (
+                <div key={item.name} className="flex-1 flex justify-center relative">
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "-mt-7 w-16 h-16 rounded-2xl flex flex-col items-center justify-center text-white shadow-lg",
+                      active ? "bg-teal-700" : "bg-gradient-to-br from-teal-500 to-emerald-500",
+                    )}
+                  >
+                    <Camera className="w-7 h-7" strokeWidth={2.2} />
+                    <span className="text-[10px] mt-0.5">拍照</span>
+                  </Link>
+                </div>
+              )
+            }
             return (
               <Link
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full transition-colors min-w-[44px] min-h-[44px] touch-manipulation",
-                  isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                  "flex-1 flex flex-col items-center justify-center h-16 gap-0.5 transition-colors",
+                  active ? "text-teal-600" : "text-slate-500",
                 )}
               >
-                <item.icon className="h-5 w-5" />
-                <span className="text-xs mt-1">{item.name}</span>
+                <item.icon className="w-5 h-5" strokeWidth={active ? 2.3 : 1.9} />
+                <span className="text-[11px]">{item.name}</span>
               </Link>
             )
           })}
