@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Therapist, UserRole } from '@/types/database'
+import { Therapist, UserRole, UserStatus } from '@/types/database'
 import { authApi, type RegisterRequest } from '@/api/auth'
 import { 
   initializeSecurity, 
@@ -24,6 +24,7 @@ interface AuthState {
   register: (data: Omit<RegisterRequest, 'password'> & { password: string; confirmPassword: string }) => Promise<void>
   logout: () => void
   checkAuth: () => Promise<void>
+  enterDemoMode: () => Promise<void>
   setUser: (user: Therapist | null) => void
   setToken: (token: string | null) => void
   clearError: () => void
@@ -162,6 +163,37 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         })
+      },
+
+      enterDemoMode: async () => {
+        set({ isLoading: true, error: null })
+        try {
+          const demoUser: Therapist = {
+            id: 1,
+            name: '演示治疗师',
+            certificate_number: 'DEMO-001',
+            phone: '13800000000',
+            email: 'demo@therapy-system.local',
+            password_hash: '',
+            role: UserRole.ADMIN,
+            status: UserStatus.ACTIVE,
+            created_at: new Date(),
+            updated_at: new Date(),
+          }
+          const demoToken = 'demo-token-' + Date.now()
+          localStorage.setItem('auth_token', demoToken)
+          set({
+            user: demoUser,
+            token: demoToken,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          })
+          setCurrentUser(demoUser)
+        } catch (error: any) {
+          set({ isLoading: false, error: '演示模式进入失败' })
+          throw error
+        }
       },
 
       checkAuth: async () => {
