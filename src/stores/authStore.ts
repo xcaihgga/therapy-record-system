@@ -173,7 +173,7 @@ export const useAuthStore = create<AuthState>()(
             name: '演示治疗师',
             certificate_number: 'DEMO-001',
             phone: '13800000000',
-            email: 'demo@therapy-system.local',
+            email: 'demo@therapy.local',
             password_hash: '',
             role: UserRole.ADMIN,
             status: UserStatus.ACTIVE,
@@ -182,6 +182,7 @@ export const useAuthStore = create<AuthState>()(
           }
           const demoToken = 'demo-token-' + Date.now()
           localStorage.setItem('auth_token', demoToken)
+          localStorage.setItem('auth_user_id', '1')
           set({
             user: demoUser,
             token: demoToken,
@@ -206,15 +207,15 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true })
         try {
           const user = await authApi.getCurrentUser()
-          
           set({
             user,
             token,
             isAuthenticated: true,
             isLoading: false,
           })
-        } catch (error) {
+        } catch {
           localStorage.removeItem('auth_token')
+          localStorage.removeItem('auth_user_id')
           set({
             user: null,
             token: null,
