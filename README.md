@@ -12,26 +12,68 @@
 - **UI组件库**: Shadcn/UI
 - **样式系统**: Tailwind CSS 3+
 
-## 核心功能
+## 项目结构
 
-- **用户认证**: 治疗师注册、登录
-- **患者管理**: 患者基本信息、档案
-- **治疗记录**: 文字、拍照水印、视频
-- **真实性证明**: 数字签名、二维码、PDF导出
-- **统计归档**: 图表、Excel/PDF导出
-- **离线支持**: IndexedDB本地存储
-- **企业微信集成**: JS-SDK自动初始化
-- **移动端优先**: PWA、安全区适配
+```
+therapy-record-system/
+├── src/
+│   ├── components/       # UI组件
+│   │   ├── layout/      # 布局组件
+│   │   └── ui/          # Shadcn/UI组件
+│   ├── pages/           # 页面组件
+│   ├── stores/          # Zustand状态管理
+│   ├── hooks/           # 自定义hooks
+│   ├── utils/           # 工具函数
+│   ├── types/           # TypeScript类型定义
+│   ├── api/             # API调用
+│   └── styles/          # 样式文件
+├── public/              # 静态资源
+└── ...config files
+```
 
-## 快速开始
+## 开始使用
+
+### 安装依赖
 
 ```bash
 npm install
-npm run dev      # 开发 http://localhost:3000
-npm run build    # 构建
-npm run preview  # 预览 http://localhost:4173
 ```
 
-## License
+### 启动开发服务器
 
-MIT
+```bash
+npm run dev
+```
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 预览生产版本
+
+```bash
+npm run preview
+```
+
+## 主要功能
+
+- **用户认证**: 注册、登录、权限管理
+- **患者管理**: 患者信息录入、检索、档案管理
+- **治疗记录**: 文字、照片、视频等多种记录方式
+- **拍照水印**: 自动添加时间、地点、治疗师信息等防伪元素
+- **真实性证明**: 数字签名、时间戳、地理定位验证
+- **统计分析**: 数据可视化、报表生成、智能分析
+
+## 开发计划
+
+- [ ] 完善用户认证系统
+- [ ] 实现拍照水印功能
+- [ ] 集成地理定位服务
+- [ ] 开发统计图表
+- [ ] 移动端适配优化
+
+## 许可证
+
+MIT License
