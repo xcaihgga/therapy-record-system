@@ -594,7 +594,7 @@ export const backupService = BackupService.getInstance()
  * 自动备份调度器
  */
 export class AutoBackupScheduler {
-  private intervalId: NodeJS.Timeout | null = null
+  private intervalId: ReturnType<typeof setInterval> | null = null
   private isRunning: boolean = false
 
   /**
