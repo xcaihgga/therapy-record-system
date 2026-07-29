@@ -11,7 +11,7 @@ import { loginSchema, type LoginFormData } from '@/lib/validations'
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login, isLoading, error, clearError, isAuthenticated, checkAuth } = useAuthStore()
+  const { login, isLoading, error, clearError, isAuthenticated, checkAuth, enterDemoMode } = useAuthStore()
   
   const {
     register,
@@ -42,6 +42,15 @@ export default function LoginPage() {
       navigate(from, { replace: true })
     } catch (error) {
       // 错误已在store中处理
+    }
+  }
+
+  const handleDemo = async () => {
+    try {
+      await enterDemoMode()
+      navigate('/dashboard', { replace: true })
+    } catch (error) {
+      // 忽略
     }
   }
 
@@ -120,6 +129,22 @@ export default function LoginPage() {
               <Link to="/register" className="font-medium text-primary hover:underline">
                 立即注册
               </Link>
+            </div>
+
+            {/* 演示模式 - 一键进入 */}
+            <div className="pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                onClick={handleDemo}
+                disabled={isLoading}
+              >
+                🚀 演示模式直接进入（无需账号密码）
+              </Button>
+              <p className="mt-2 text-xs text-center text-gray-500">
+                点击立即体验系统全部功能，数据仅保存在本机浏览器
+              </p>
             </div>
           </form>
         </CardContent>
