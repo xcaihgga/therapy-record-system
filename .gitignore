@@ -4,6 +4,9 @@ dist
 *.local
 .env
 .env.local
+.env.production
+.env.development
+.env.staging
 .vscode
 .idea
 .DS_Store
